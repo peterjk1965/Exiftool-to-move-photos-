@@ -18,6 +18,20 @@ find "${photos_dir}" -type f -iname '*.heic' | while IFS= read -r heic_file; do
     fi
 done
 
+# Convert PNG to JPG and delete original PNG after conversion
+find "${photos_dir}" -type f -iname '*.png' | while IFS= read -r png_file; do
+    jpg_file="${png_file%.*}.jpg"
+    if [ ! -f "$jpg_file" ]; then
+        echo "Converting: $png_file → $jpg_file"
+        if convert "$png_file" "$jpg_file"; then
+            echo "Deleting original PNG: $png_file"
+            rm "$png_file"
+        fi
+    else
+        echo "Skipping: $jpg_file already exists."
+    fi
+done
+
 # 2. Sort JPGs (your fallback date logic)
 find "${photos_dir}" -type f -iname '*.jpg' | while IFS= read -r photo; do
     echo "Processing: $photo"
